@@ -1,0 +1,55 @@
+<style>
+  .highlight {
+    outline: #3e6fa0 2px solid;
+  }
+
+  .player {
+    width: 18rem;
+    margin-bottom: 5px;
+  }
+
+  .turnRoll {
+    margin-right: 5px;
+    margin-bottom: 5px;
+  }
+</style>
+
+<div *ngIf="game != null" class="layout horizontal">
+  <div class="layout vertical">
+    <div *ngFor="let player of game.players" class="card text-center player" [class.highlight]="game.currentPlayer == player">
+      <div class="card-body">
+        <h4 class="card-title">{{player.name}}</h4>
+
+        <div class="layout vertical center-center">
+          <h5>{{player.totalScore}}</h5>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex layout horizontal" style="margin-left: 2rem;">
+    <div class="layout vertical justified">
+      <dom-die #die></dom-die>
+      <material-button (trigger)="roll()" [disabled]="!rollEnabled">Roll</material-button>
+    </div>
+
+    <div class="flex layout vertical justified" style="margin-left: 2rem;">
+      <div class="layout horizontal wrap">
+        <li *ngFor="let turnRoll of turnRolls" class="list-group-item turnRoll">{{turnRoll}}</li>
+      </div>
+      <material-button (trigger)="game.playerCommitScore()" [disabled]="turnRolls.isEmpty">Commit ({{game.currentPlayer.turnScore}})</material-button>
+    </div>
+  </div>
+</div>
+
+<modal [visible]="winner != null">
+  <material-dialog>
+    <div header>
+      <h3>{{winner}} wins!</h3>
+    </div>
+
+    <div footer>
+      <material-button (trigger)="newGame()">New Game</material-button>
+    </div>
+  </material-dialog>
+</modal>
