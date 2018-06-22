@@ -1,7 +1,8 @@
+import 'dart:html';
+
 import 'package:angular/angular.dart';
 import 'package:angular_components/angular_components.dart';
 
-import 'src/models/global.dart';
 import 'src/services/logger_service.dart';
 import 'src/models/game.dart';
 import 'src/models/player.dart';
@@ -9,6 +10,13 @@ import 'src/components/game_view/game_view.dart';
 
 // AngularDart info: https://webdev.dartlang.org/angular
 // Components info: https://webdev.dartlang.org/components
+
+const String appName = "one_hundred";
+final bool debugMode = window.location.host.contains('localhost');
+
+LoggerService log;
+
+LoggerService newLogger() => log = LoggerService(appName: appName, debugMode: debugMode);
 
 @Component(
   selector: 'my-app',
