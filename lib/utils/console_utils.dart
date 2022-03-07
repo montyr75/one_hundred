@@ -1,6 +1,7 @@
 import 'package:console/console.dart' show Console, Prompter;
 
 typedef PromptValidator = bool Function(String input);
+typedef IntPromptValidator = bool Function(int input);
 
 const invalidInput = "Invalid input.";
 
@@ -44,15 +45,16 @@ double promptForDoubleExt(String prompt, {String errorMsg = invalidInput}) {
   return promptForDoubleExt(prompt);
 }
 
-int promptForIntExt(String prompt, {String errorMsg = invalidInput}) {
+int promptForIntExt(String prompt, {IntPromptValidator? validator, String errorMsg = invalidInput}) {
   final input = promptForInt(prompt);
 
-  if (input != null) {
-    return input;
+  // validate input
+  if (input == null || (validator != null && !validator(input))) {
+    printError(errorMsg);
+    return promptForIntExt(prompt, validator: validator, errorMsg: errorMsg);
   }
 
-  printError(errorMsg);
-  return promptForIntExt(prompt);
+  return input;
 }
 
 String? promptForString(String prompt) {
@@ -119,4 +121,44 @@ void printMessage(String msg) {
 void printInlineMessage(String msg) {
   Console.setTextColor(ConsoleColor.white.index, bright: true);
   Console.write(msg);
+}
+
+const maxOptions = 10;
+const badMenuSelectionMsg = "What the hell are you talking about? Try again, pal!";
+
+ConsoleMenuOption printConsoleMenu(List<ConsoleMenuOption> options, {String prompt = "Selection"}) {
+  assert(options.length < maxOptions, "TOO MANY OPTIONS");
+
+  consoleNewLine();
+
+  for (int i = 0; i < options.length; i++) {
+    printMenuItem(phrase: "${i + 1}. ${options[i]}");
+  }
+
+  final input = promptForInt("$prompt: ");
+
+  // check that we have a valid integer
+  if (input != null) {
+    final index = input - 1;
+
+    // check for valid index range
+    if (index >= 0 && index < options.length) {
+      final selectedOption = options[index];
+      selectedOption.onSelect?.call();
+      return selectedOption;
+    }
+  }
+
+  printError("Invalid Input");
+  return printConsoleMenu(options);
+}
+
+class ConsoleMenuOption {
+  final String label;
+  final Function? onSelect;
+
+  const ConsoleMenuOption(this.label, {this.onSelect});
+
+  @override
+  String toString() => label;
 }
