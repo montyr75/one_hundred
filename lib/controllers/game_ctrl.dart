@@ -9,11 +9,17 @@ class GameCtrl {
   final _onTurn = StreamController<Player>.broadcast();
   Stream<Player> get onTurn => _onTurn.stream;
 
+  final _onOne = StreamController<Player>.broadcast();
+  Stream<Player> get onOne => _onOne.stream;
+
   final _onWin = StreamController<Player>.broadcast();
   Stream<Player> get onWin => _onWin.stream;
 
   GameCtrl(List<String> playerNames) {
     game = Game(players: List.unmodifiable(playerNames.map((name) => Player(name: name)).toList()));
+
+    // delay stream output until listeners are in place
+    scheduleMicrotask(nextTurn);
   }
 
   void nextTurn() {
@@ -24,7 +30,11 @@ class GameCtrl {
       _onTurn.add(game.currentPlayer);
     }
     else {
-      nextPlayer();
+      _onOne.add(game.currentPlayer);
+      game = game.updateCurrentPlayer(game.currentPlayer.copyWith(rolls: const []));
+
+      // delay to allow all streams to complete
+      scheduleMicrotask(nextPlayer);
     }
   }
 
@@ -35,20 +45,22 @@ class GameCtrl {
       nextIndex = 0;
     }
 
-    game =  game.copyWith(currentPlayerIndex: nextIndex);
+    game = game.copyWith(currentPlayerIndex: nextIndex);
 
     nextTurn();
   }
 
   void commit() {
     game = game.updateCurrentPlayer(game.currentPlayer.copyWith(
-      score: game.currentPlayer.score + game.currentPlayer.rollTotal,
+      score: game.currentPlayer.commitTotal,
       rolls: const [],
     ));
 
-    // TODO: Detect if there's a winner and send the winner out on onWin stream.
-    // TODO: Only do next turn if there's not a winner.
-
-    nextTurn();
+    if (game.currentPlayer.score >= 100) {
+      _onWin.add(game.currentPlayer);
+    }
+    else {
+      nextPlayer();
+    }
   }
 }

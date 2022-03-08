@@ -23,5 +23,5 @@ class Game {
   }
 
   Game updateCurrentPlayer(Player player) =>
-      copyWith(players: List.unmodifiable(players..replaceWith(currentPlayer, player)));
+      copyWith(players: List.unmodifiable(players.toList()..replaceWith(currentPlayer, player)));
 }

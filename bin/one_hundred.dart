@@ -9,6 +9,7 @@ void main() {
   Console.init();
 
   printTitle();
+  newGame();
 }
 
 void printTitle() {
@@ -19,6 +20,7 @@ void newGame([List<String>? playerNames]) {
   ctrl = GameCtrl(playerNames ?? getPlayerNames());
 
   ctrl.onTurn.listen(doPlayerTurn);
+  ctrl.onOne.listen(doPlayerOne);
   ctrl.onWin.listen(doPlayerWins);
 }
 
@@ -32,16 +34,19 @@ List<String> getPlayerNames() {
 }
 
 void doPlayerTurn(Player player) {
-  printMessage(player.toString());
+  printSuccess(player.toString());
   printMessage("${player.rolls} = ${player.rollTotal}");
 
   printConsoleMenu([
     ConsoleMenuOption("Roll Again", onSelect: ctrl.nextTurn),
-    ConsoleMenuOption("Commit Score and End Turn", onSelect: ctrl.commit),
+    ConsoleMenuOption("Commit Score and End Turn (${player.commitTotal})", onSelect: ctrl.commit),
   ]);
-
 }
 
 void doPlayerWins(Player player) {
+  printMessage("${player.name} wins!\nScore: ${player.score}");
+}
 
+void doPlayerOne(Player player) {
+  printError("${player.name} rolled a one. Next player!");
 }

@@ -27,6 +27,7 @@ class Player {
   Player addRoll(int value) => copyWith(rolls: List.unmodifiable(rolls.toList()..add(value)));
 
   int get rollTotal => rolls.sum();
+  int get commitTotal => rollTotal + score;
 
   @override
   String toString() => "$name: $score";
