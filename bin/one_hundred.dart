@@ -2,6 +2,7 @@ import 'package:console/console.dart';
 import 'package:one_hundred/controllers/game_ctrl.dart';
 import 'package:one_hundred/models/models.dart';
 import 'package:one_hundred/utils/console_utils.dart';
+import 'package:one_hundred/utils/roller.dart';
 
 late GameCtrl ctrl;
 
